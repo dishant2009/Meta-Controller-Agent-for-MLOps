@@ -1,0 +1,105 @@
+"""
+This file contains a sample configuration for the Meta-Controller Agent.
+Save this as config.json to run the system.
+"""
+
+{
+    "decision_engine": {
+        "model_type": "hybrid",
+        "llm_config": {
+            "model_name": "gpt-4",
+            "temperature": 0.2,
+            "max_tokens": 500
+        },
+        "rl_config": {
+            "state_features": [
+                "drift_severity", 
+                "performance_drop", 
+                "error_rate", 
+                "latency_increase", 
+                "data_quality_score"
+            ],
+            "action_space": [
+                "ROLLBACK", 
+                "RETRAIN", 
+                "INVESTIGATE", 
+                "FIX_PIPELINE", 
+                "NOTIFY"
+            ],
+            "learning_rate": 0.01,
+            "discount_factor": 0.95
+        }
+    },
+    "monitoring": {
+        "drift_detector": {
+            "algorithm": "ks_test",
+            "detection_threshold": 0.6,
+            "window_size": 1000
+        },
+        "anomaly_detector": {
+            "detection_threshold": 3.0
+        },
+        "metrics_tracker": {
+            "max_history_size": 1000,
+            "sla_definitions": {
+                "latency_sla": {
+                    "metric": "latency",
+                    "threshold": 200,
+                    "comparison": "less_than"
+                },
+                "accuracy_sla": {
+                    "metric": "accuracy",
+                    "threshold": 0.8,
+                    "comparison": "greater_than"
+                },
+                "error_rate_sla": {
+                    "metric": "error_rate",
+                    "threshold": 0.02,
+                    "comparison": "less_than"
+                }
+            }
+        }
+    },
+    "pipeline": {
+        "data_processor": {
+            "default_validation": {
+                "enabled": true,
+                "strict": false
+            }
+        },
+        "model_trainer": {
+            "frameworks": ["sklearn", "pytorch", "tensorflow"],
+            "default_metrics": ["accuracy", "precision", "recall", "f1_score"]
+        },
+        "hyperparameter_tuner": {
+            "tuning_method": "bayesian_optimization",
+            "max_trials": 50,
+            "timeout": 3600
+        }
+    },
+    "deployment": {
+        "model_registry": {
+            "storage_path": "model_registry"
+        },
+        "deployment_manager": {
+            "default_strategy": "blue_green",
+            "environments": {
+                "dev": {
+                    "strategy": "simple"
+                },
+                "staging": {
+                    "strategy": "blue_green"
+                },
+                "production": {
+                    "strategy": "canary",
+                    "canary_steps": [5, 20, 50, 100]
+                }
+            }
+        },
+        "rollback_handler": {
+            "auto_rollback_threshold": 0.7
+        },
+        "environments": ["dev", "staging", "production"]
+    },
+    "monitoring_interval": 10
+}
